@@ -7,7 +7,7 @@ import (
 )
 
 func GetDirFromHome(path ...string) string {
-  home, err := os.UserHomeDir()
+	home, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -16,6 +16,10 @@ func GetDirFromHome(path ...string) string {
 
 	dir := filepath.Join(fullPath...)
 	return dir
+}
+
+func GetConfigDir() string {
+	return GetDirFromHome(".config", "prt")
 }
 
 func GetCurrentDir() string {
@@ -28,7 +32,7 @@ func GetCurrentDir() string {
 }
 
 func GetDirFromCurr(path ...string) string {
-  dir := GetCurrentDir()
+	dir := GetCurrentDir()
 
 	fullPath := append([]string{dir}, path...)
 
@@ -37,9 +41,9 @@ func GetDirFromCurr(path ...string) string {
 }
 
 func DirExists(path string) bool {
-  _, err := os.Stat(path)
-  if err != nil {
-    return false
-  }
-  return true
+	_, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return true
 }
