@@ -2,7 +2,6 @@ package utils
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -35,23 +34,35 @@ func InTmuxSession() bool {
 func KillSession(name string) {
 	cmd := exec.Command("tmux", "kill-session", "-t", name)
 
-  err := cmd.Start() 
-  if err != nil {
-    log.Fatal(err)
-  }
+	err := cmd.Start()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	err = cmd.Wait()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Session killed.")
+}
+
+func SwitchSession(name string) {
+	cmd := exec.Command("tmux", "switch-client", "-t", name)
+
+	if err := cmd.Start(); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := cmd.Wait(); err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 func KillCurrSession() {
 	cmd := exec.Command("tmux", "kill-session")
 
-  err := cmd.Start()
-  if err != nil {
+	err := cmd.Start()
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -59,5 +70,30 @@ func KillCurrSession() {
 	if err != nil {
 		log.Fatal(err)
 	}
-  fmt.Println("Current session killed.")
+}
+
+func UnsetSession() {
+	cmd := exec.Command("unset", "TMUX")
+
+	if err := cmd.Start(); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := cmd.Wait(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func AttachSession(name string) {
+	cmd := exec.Command("tmux", "attach-session", "-t", name)
+  cmd.Stdin = os.Stdin
+  cmd.Stdout = os.Stdout
+  cmd.Stderr = os.Stderr
+
+	if err := cmd.Start(); err != nil {
+		log.Fatal(err)
+	}
+	if err := cmd.Wait(); err != nil {
+		log.Fatal(err)
+	}
 }

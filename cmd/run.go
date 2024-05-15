@@ -33,13 +33,13 @@ var runCmd = &cobra.Command{
 			log.Fatal("Project not found.")
 		}
 
-		if utils.SessionExists(project) {
-			utils.KillSession(project)
-		}
-
-		if utils.InTmuxSession() {
-			utils.KillCurrSession()
-		}
+		if utils.SessionExists(project) && utils.InTmuxSession() {
+			utils.SwitchSession(project)
+			return
+		} else if utils.SessionExists(project) {
+      utils.AttachSession(project)
+      return
+    }
 
 		if err := os.Chdir(dir); err != nil {
 			log.Fatal(err)
@@ -50,8 +50,12 @@ var runCmd = &cobra.Command{
 		tmuxCmd.Stdout = os.Stdout
 		tmuxCmd.Stderr = os.Stderr
 
+		if err := tmuxCmd.Start(); err != nil {
+			log.Fatal(err)
+		}
+
 		fmt.Println("Session started.")
-		if err := tmuxCmd.Run(); err != nil {
+		if err := tmuxCmd.Wait(); err != nil {
 			log.Fatal(err)
 		}
 	},
