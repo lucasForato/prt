@@ -17,15 +17,14 @@ var runCmd = &cobra.Command{
 	Long:  `Use this command to run a project`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-    project := args[0]
+		project := args[0]
 
 		prt := utils.GetDirFromHome(".config", "prt")
 		viper.SetConfigName("config")
 		viper.SetConfigType("yaml")
 		viper.AddConfigPath(prt)
 
-		err := viper.ReadInConfig()
-		if err != nil {
+		if err := viper.ReadInConfig(); err != nil {
 			log.Fatal(err)
 		}
 
@@ -42,8 +41,7 @@ var runCmd = &cobra.Command{
 			utils.KillCurrSession()
 		}
 
-		err = os.Chdir(dir)
-		if err != nil {
+		if err := os.Chdir(dir); err != nil {
 			log.Fatal(err)
 		}
 
@@ -52,9 +50,8 @@ var runCmd = &cobra.Command{
 		tmuxCmd.Stdout = os.Stdout
 		tmuxCmd.Stderr = os.Stderr
 
-		err = tmuxCmd.Run()
 		fmt.Println("Session started.")
-		if err != nil {
+		if err := tmuxCmd.Run(); err != nil {
 			log.Fatal(err)
 		}
 

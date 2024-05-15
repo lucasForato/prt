@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
+	"log"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -12,14 +12,12 @@ var Verbose bool
 var rootCmd = &cobra.Command{
 	Use:   "prt",
 	Short: "short description.",
-	Long: `long description.`,
+	Long:  `long description.`,
 }
 
 func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatal(err)
 	}
 }
 
