@@ -31,7 +31,21 @@ var initCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		fmt.Println("Initialized prt")
+    path = filepath.Join(home, ".config", "prt", "config.json")
+    f, createErr := os.Create(path)
+    if createErr != nil {
+      log.Fatal(createErr)
+    }
+
+    _, writeErr := f.WriteString("{\n\"projects\": [\n]\n}")
+    if writeErr != nil {
+      log.Fatal(writeErr)
+    }
+
+
+    if Verbose {
+      fmt.Println("Initialized prt")
+    }
 	},
 }
 

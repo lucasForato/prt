@@ -2,9 +2,15 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
+	"log"
 	"os"
+	"path/filepath"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
+
+var Verbose bool
 
 var rootCmd = &cobra.Command{
 	Use:   "prt",
@@ -26,5 +32,30 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Display more verbose output in console output. (default: false)")
+	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+
+	var home, err = os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+  path := filepath.Join(home, ".config", "prt")
+	err = os.MkdirAll(path, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	viper.SetConfigFile("config")
+  viper.SetConfigType("toml")
+  viper.AddConfigPath(".")
+
+	viperErr := viper.ReadInConfig()
+  if err != nil {
+    panic(fmt.Errorf("fatal error config file: %w", viperErr))
+  }
+
+  homeDir := viper.GetString("home")
+
+  fmt.Println(homeDir)
 }
