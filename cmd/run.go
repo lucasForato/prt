@@ -19,10 +19,10 @@ var runCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		project := args[0]
 
-		prt := utils.GetDirFromHome(".config", "prt")
+		config := utils.GetConfigDir()
 		viper.SetConfigName("config")
 		viper.SetConfigType("yaml")
-		viper.AddConfigPath(prt)
+		viper.AddConfigPath(config)
 
 		if err := viper.ReadInConfig(); err != nil {
 			log.Fatal(err)
@@ -54,7 +54,6 @@ var runCmd = &cobra.Command{
 		if err := tmuxCmd.Run(); err != nil {
 			log.Fatal(err)
 		}
-
 	},
 }
 
