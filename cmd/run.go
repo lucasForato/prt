@@ -33,13 +33,15 @@ var runCmd = &cobra.Command{
 			log.Fatal("Project not found.")
 		}
 
-		if utils.SessionExists(project) && utils.InTmuxSession() {
+		if !utils.SessionExists(project) && utils.InTmuxSession() {
+			log.Fatal("Use [kill] before doing that.")
+		} else if utils.SessionExists(project) && utils.InTmuxSession() {
 			utils.SwitchSession(project)
 			return
 		} else if utils.SessionExists(project) {
-      utils.AttachSession(project)
-      return
-    }
+			utils.AttachSession(project)
+			return
+		}
 
 		if err := os.Chdir(dir); err != nil {
 			log.Fatal(err)
