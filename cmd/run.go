@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"os"
-	"os/exec"
 
 	"github.com/lucasForato/prt/utils"
 	"github.com/spf13/cobra"
@@ -47,19 +45,15 @@ var runCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		tmuxCmd := exec.Command("tmux", "new-session", "-s", project)
-		tmuxCmd.Stdin = os.Stdin
-		tmuxCmd.Stdout = os.Stdout
-		tmuxCmd.Stderr = os.Stderr
-
-		if err := tmuxCmd.Start(); err != nil {
-			log.Fatal(err)
+		var tmux = utils.Tmux{
+			Name: project,
+			Git:  true,
+			Term: 1,
+			Cmd1: "nvim .",
+			Cmd2: "git status",
 		}
 
-		fmt.Println("Session started.")
-		if err := tmuxCmd.Wait(); err != nil {
-			log.Fatal(err)
-		}
+		tmux.CreateSession()
 	},
 }
 

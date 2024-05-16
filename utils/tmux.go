@@ -86,14 +86,39 @@ func UnsetSession() {
 
 func AttachSession(name string) {
 	cmd := exec.Command("tmux", "attach-session", "-t", name)
-  cmd.Stdin = os.Stdin
-  cmd.Stdout = os.Stdout
-  cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	if err := cmd.Start(); err != nil {
 		log.Fatal(err)
 	}
 	if err := cmd.Wait(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+type Tmux struct {
+	Name string
+	Git  bool
+	Term int8
+	Cmd1 string
+	Cmd2 string
+}
+
+func (t Tmux) CreateSession() {
+	cmd := "tmux"
+	args := []string{"new-session", "-s", t.Name, "-n", "vim", "nvim ."}
+	exec := exec.Command(cmd, args...)
+	exec.Stdin = os.Stdin
+	exec.Stdout = os.Stdout
+	exec.Stderr = os.Stderr
+
+	if err := exec.Start(); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := exec.Wait(); err != nil {
 		log.Fatal(err)
 	}
 }
