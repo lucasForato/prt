@@ -9,6 +9,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+var git bool
+var terms int
+
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Use this command to run a project",
@@ -46,11 +49,9 @@ var runCmd = &cobra.Command{
 		}
 
 		var tmux = utils.Tmux{
-			Name: project,
-			Git:  true,
-			Term: 1,
-			Cmd1: "nvim .",
-			Cmd2: "git status",
+			Name:  project,
+			Git:   git,
+			Terms: terms,
 		}
 
 		tmux.CreateSession()
@@ -58,5 +59,7 @@ var runCmd = &cobra.Command{
 }
 
 func init() {
+	runCmd.Flags().BoolVarP(&git, "git", "g", false, "Run with this to a git window")
+	runCmd.Flags().IntVarP(&terms, "term", "t", terms, "Number of terminals")
 	rootCmd.AddCommand(runCmd)
 }

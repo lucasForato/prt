@@ -99,16 +99,28 @@ func AttachSession(name string) {
 }
 
 type Tmux struct {
-	Name string
-	Git  bool
-	Term int8
-	Cmd1 string
-	Cmd2 string
+	Name  string
+	Git   bool
+	Terms int
 }
 
 func (t Tmux) CreateSession() {
 	cmd := "tmux"
 	args := []string{"new-session", "-s", t.Name, "-n", "vim", "nvim ."}
+
+	if t.Git {
+		args = append(args, ";", "new-window", "-n", "git", "lazygit")
+	}
+
+	if t.Terms == 1 {
+		args = append(args, ";", "new-window", "-n", "terminal")
+	}
+
+	if t.Terms == 2 {
+		args = append(args, ";", "new-window", "-n", "terminal")
+		args = append(args, ";", "splitw", "-h")
+	}
+
 	exec := exec.Command(cmd, args...)
 	exec.Stdin = os.Stdin
 	exec.Stdout = os.Stdout
