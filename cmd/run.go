@@ -48,6 +48,10 @@ var runCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
+    if terms > 2 {
+      log.Fatal("You can't use more than 2 terminals.")
+    }
+
 		var tmux = utils.Tmux{
 			Name:  project,
 			Git:   git,
