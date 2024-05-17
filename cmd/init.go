@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 
 	"github.com/lucasForato/prt/utils"
@@ -11,34 +10,52 @@ import (
 
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Use this command to initialize prt",
-	Long:  `Use this command to initialize prt`,
+	Short: "Initialize prt by creating a config file at .config/prt",
+	Long: `Initialization command:
+
+  This command will create a config file at .config/prt/
+  You should run this command before using any other command. 
+  `,
 	Run: func(cmd *cobra.Command, args []string) {
+		log.Info("Initializing prt...")
+
 		dotConfig := utils.GetDirFromHome(".config")
 		err := os.Chmod(dotConfig, 0755)
 		if err != nil {
-			log.Fatal(err)
+			log.WithFields(log.Fields{
+				"directory": ".config",
+			}).Fatal("Error changing permissions of directory")
 		}
 
 		prt := utils.GetDirFromHome(".config", "prt")
 		err = os.MkdirAll(prt, 0755)
 		if err != nil {
-			log.Fatal(err)
+			log.WithFields(log.Fields{
+				"directory": ".config/prt",
+			}).Fatal("Error creating directory")
 		}
 
 		config := utils.GetDirFromHome(".config", "prt", "config.yaml")
 		if !utils.DirExists(config) {
 			_, createErr := os.Create(config)
 			if createErr != nil {
-				log.Fatal(createErr)
+				log.WithFields(log.Fields{
+					"directory": ".config/prt",
+					"config":    "config.yaml",
+				}).Fatal("Error creating config file")
 			}
 		} else {
-      fmt.Println("prt already initialized.")
-    }
-
-		if Verbose {
-			fmt.Println("Initialized prt.")
+			log.WithFields(log.Fields{
+				"directory": ".config/prt",
+				"file":      "config.yaml",
+			}).Warn("Config file already exists")
+      return
 		}
+
+		log.WithFields(log.Fields{
+			"directory": ".config/prt",
+			"file":      "config.yaml",
+		}).Info("Config file created sucessfully")
 	},
 }
 

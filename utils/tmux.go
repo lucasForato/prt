@@ -2,25 +2,26 @@ package utils
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 func SessionExists(sessionName string) bool {
-	cmd := exec.Command("tmux", "list-sessions")
+	cmd := exec.Command("tmux", "has-session", "-t", sessionName)
 
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
 
 	err := cmd.Run()
 	if err != nil {
-		log.Fatal(err)
+		return false
 	}
 
 	output := stdout.String()
-	return strings.Contains(output, sessionName)
+	fmt.Println(output)
+	return output == "0"
 }
 
 func InTmuxSession() bool {
@@ -102,6 +103,7 @@ type Tmux struct {
 	Name  string
 	Git   bool
 	Terms int
+	Cmd   []string
 }
 
 func (t Tmux) CreateSession() {
@@ -113,12 +115,21 @@ func (t Tmux) CreateSession() {
 	}
 
 	if t.Terms == 1 {
-		args = append(args, ";", "new-window", "-n", "terminal")
+		if len(t.Cmd) > 0 {
+			args = append(args, ";", "new-window", "-n", "terminal", t.Cmd[0])
+		} else {
+			args = append(args, ";", "new-window", "-n", "terminal")
+		}
 	}
 
 	if t.Terms == 2 {
-		args = append(args, ";", "new-window", "-n", "terminal")
-		args = append(args, ";", "splitw", "-h")
+		if len(t.Cmd) > 1 {
+			args = append(args, ";", "new-window", "-n", "terminal", t.Cmd[0])
+		  args = append(args, ";", "splitw", "-h", t.Cmd[1])
+		} else {
+			args = append(args, ";", "new-window", "-n", "terminal", t.Cmd[0])
+		  args = append(args, ";", "splitw", "-h")
+		}
 	}
 
 	exec := exec.Command(cmd, args...)

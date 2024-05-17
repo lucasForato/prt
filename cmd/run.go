@@ -10,7 +10,9 @@ import (
 )
 
 var git bool
-var terms int
+var terms bool
+var term bool
+var cmds []string
 
 var runCmd = &cobra.Command{
 	Use:   "run",
@@ -34,9 +36,9 @@ var runCmd = &cobra.Command{
 			log.Fatal("Project not found.")
 		}
 
-		if !utils.SessionExists(project) && utils.InTmuxSession() {
+		if utils.InTmuxSession() && !utils.SessionExists(project) {
 			log.Fatal("Use [kill] before doing that.")
-		} else if utils.SessionExists(project) && utils.InTmuxSession() {
+		} else if utils.InTmuxSession() && utils.SessionExists(project) {
 			utils.SwitchSession(project)
 			return
 		} else if utils.SessionExists(project) {
@@ -48,14 +50,18 @@ var runCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-    if terms > 2 {
-      log.Fatal("You can't use more than 2 terminals.")
+    numTerms := 0
+    if (terms) {
+      numTerms = 2
+    } else if (term) {
+      numTerms = 1
     }
 
 		var tmux = utils.Tmux{
 			Name:  project,
 			Git:   git,
-			Terms: terms,
+			Terms: numTerms,
+      Cmd: cmds,
 		}
 
 		tmux.CreateSession()
@@ -64,6 +70,8 @@ var runCmd = &cobra.Command{
 
 func init() {
 	runCmd.Flags().BoolVarP(&git, "git", "g", false, "Run with this to a git window")
-	runCmd.Flags().IntVarP(&terms, "term", "t", terms, "Number of terminals")
+	runCmd.Flags().BoolVarP(&terms, "terms", "t", false, "Run with this flag to get two terminals")
+	runCmd.Flags().BoolVarP(&term, "term", "e", false, "Run with this flag to get a single terminal")
+  runCmd.Flags().StringSliceVarP(&cmds, "cmd", "c", cmds, "Run with this flag to add commands to the terminals")
 	rootCmd.AddCommand(runCmd)
 }
