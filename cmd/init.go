@@ -16,6 +16,7 @@ var initCmd = &cobra.Command{
   This command will create a config file at .config/prt/
   You should run this command before using any other command. 
   `,
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Info("Initializing prt...")
 

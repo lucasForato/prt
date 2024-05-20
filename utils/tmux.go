@@ -2,8 +2,7 @@ package utils
 
 import (
 	"bytes"
-	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
 )
@@ -20,7 +19,6 @@ func SessionExists(sessionName string) bool {
 	}
 
 	output := stdout.String()
-	fmt.Println(output)
 	return output == "0"
 }
 
@@ -125,10 +123,10 @@ func (t Tmux) CreateSession() {
 	if t.Terms == 2 {
 		if len(t.Cmd) > 1 {
 			args = append(args, ";", "new-window", "-n", "terminal", t.Cmd[0])
-		  args = append(args, ";", "splitw", "-h", t.Cmd[1])
+			args = append(args, ";", "splitw", "-h", t.Cmd[1])
 		} else {
 			args = append(args, ";", "new-window", "-n", "terminal", t.Cmd[0])
-		  args = append(args, ";", "splitw", "-h")
+			args = append(args, ";", "splitw", "-h")
 		}
 	}
 
