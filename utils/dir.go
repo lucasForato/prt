@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 )
@@ -20,6 +20,10 @@ func GetDirFromHome(path ...string) string {
 
 func GetConfigDir() string {
 	return GetDirFromHome(".config", "prt")
+}
+
+func GetConfigFile() string {
+  return GetDirFromHome(".config", "prt", "config.yaml")
 }
 
 func GetCurrentDir() string {

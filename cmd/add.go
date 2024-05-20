@@ -1,28 +1,47 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/lucasForato/prt/utils"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Use this command to add a project to config",
-	Long:  `Use this command to add a project to config`,
-  Args: cobra.ExactArgs(2),
+	Long: `This commands adds a new project at /home/.config/prt/config.yaml
+
+  - Use [prt ls] to list all projects at the configuration file.
+  `,
+	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-    pathFromHome := utils.GetDirFromHome(".config", "prt", "config.yaml")
-    pathFromCurrent := utils.GetDirFromCurr(args[1])
+		project := args[0]
 
-    entry := buildEntry(args[0], pathFromCurrent)
-    utils.AppendToFile(pathFromHome, entry)
+		config := utils.GetConfigDir()
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
+		viper.AddConfigPath(config)
+		if err := viper.ReadInConfig(); err != nil {
+			log.Fatal(err)
+		}
+
+		if exists := viper.Get(project); exists != nil {
+			log.WithFields(log.Fields{
+				"project": project,
+			}).Fatal("This project already exists.")
+		}
+
+		dir := utils.GetDirFromCurr(args[1])
+		entry := utils.BuildEntry(project, dir)
+
+    config = utils.GetConfigFile()
+		utils.AppendToFile(config, entry)
+		log.WithFields(log.Fields{
+			"project":   project,
+			"directory": dir,
+		}).Info("Added new project to prt")
 	},
-}
-
-func buildEntry(projectName string, projectPath string) string {
-    return fmt.Sprintf("%v: \"%v\"\n", projectName, projectPath)
 }
 
 func init() {

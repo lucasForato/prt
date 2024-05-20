@@ -17,7 +17,11 @@ var cmds []string
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Use this command to run a project",
-	Long:  `Use this command to run a project`,
+	Long:  `Use this command to create a tmux session for a project listed on the config.
+
+  - Use [prt ls] to list all possible project. 
+  - Use [prt run] followed by the project and desired configuration.
+  `,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		project := args[0]
@@ -33,11 +37,13 @@ var runCmd = &cobra.Command{
 
 		dir := viper.GetString(project)
 		if len(dir) == 0 {
-			log.Fatal("Project not found.")
+			log.WithFields(log.Fields{
+				"project": project,
+			}).Fatal("Project not found.")
 		}
 
 		if utils.InTmuxSession() && !utils.SessionExists(project) {
-			log.Fatal("Use [kill] before doing that.")
+			log.Fatal("Kill the current session using [kill] before initializing a new session.")
 		} else if utils.InTmuxSession() && utils.SessionExists(project) {
 			utils.SwitchSession(project)
 			return
@@ -50,18 +56,18 @@ var runCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-    numTerms := 0
-    if (terms) {
-      numTerms = 2
-    } else if (term) {
-      numTerms = 1
-    }
+		numTerms := 0
+		if terms {
+			numTerms = 2
+		} else if term {
+			numTerms = 1
+		}
 
 		var tmux = utils.Tmux{
 			Name:  project,
 			Git:   git,
 			Terms: numTerms,
-      Cmd: cmds,
+			Cmd:   cmds,
 		}
 
 		tmux.CreateSession()
@@ -72,6 +78,6 @@ func init() {
 	runCmd.Flags().BoolVarP(&git, "git", "g", false, "Run with this to a git window")
 	runCmd.Flags().BoolVarP(&terms, "terms", "t", false, "Run with this flag to get two terminals")
 	runCmd.Flags().BoolVarP(&term, "term", "e", false, "Run with this flag to get a single terminal")
-  runCmd.Flags().StringSliceVarP(&cmds, "cmd", "c", cmds, "Run with this flag to add commands to the terminals")
+	runCmd.Flags().StringSliceVarP(&cmds, "cmd", "c", cmds, "Run with this flag to add commands to the terminals")
 	rootCmd.AddCommand(runCmd)
 }

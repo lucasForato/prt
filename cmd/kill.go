@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/lucasForato/prt/utils"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -12,6 +13,7 @@ var killCmd = &cobra.Command{
   Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		utils.KillCurrSession()
+    log.Info("Current session killed successfully")
 	},
 }
 

@@ -17,8 +17,8 @@ var rootCmd = &cobra.Command{
 
   By using the prt command, you can initialize tmux session effortlessly by only providing command line arguments.
 
-  - use [prt] followed by a directory to initialize the default session.
-  - use [prt init] to initialize a configuration.
+  - Use [prt] followed by a directory to initialize the default session.
+  - Use [prt init] to initialize a configuration.
   `,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
