@@ -106,10 +106,10 @@ type Tmux struct {
 
 func (t Tmux) CreateSession() {
 	cmd := "tmux"
-	args := []string{"new-session", "-s", t.Name, "-n", "vim", "nvim ."}
+	args := []string{"new-session", "-s", t.Name, "-n", "vim", "nvim . ; bash"}
 
 	if t.Git {
-		args = append(args, ";", "new-window", "-n", "git", "lazygit")
+		args = append(args, ";", "new-window", "-n", "git", "lazygit ; bash")
 	}
 
 	if t.Terms >= 1 {
