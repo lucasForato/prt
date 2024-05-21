@@ -2,9 +2,10 @@ package utils
 
 import (
 	"bytes"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func SessionExists(sessionName string) bool {
@@ -101,7 +102,6 @@ type Tmux struct {
 	Name  string
 	Git   bool
 	Terms int
-	Cmd   []string
 }
 
 func (t Tmux) CreateSession() {
@@ -112,22 +112,16 @@ func (t Tmux) CreateSession() {
 		args = append(args, ";", "new-window", "-n", "git", "lazygit")
 	}
 
-	if t.Terms == 1 {
-		if len(t.Cmd) > 0 {
-			args = append(args, ";", "new-window", "-n", "terminal", t.Cmd[0])
-		} else {
-			args = append(args, ";", "new-window", "-n", "terminal")
-		}
+	if t.Terms >= 1 {
+		args = append(args, ";", "new-window", "-n", "terminal")
 	}
 
-	if t.Terms == 2 {
-		if len(t.Cmd) > 1 {
-			args = append(args, ";", "new-window", "-n", "terminal", t.Cmd[0])
-			args = append(args, ";", "splitw", "-h", t.Cmd[1])
-		} else {
-			args = append(args, ";", "new-window", "-n", "terminal", t.Cmd[0])
-			args = append(args, ";", "splitw", "-h")
-		}
+	if t.Terms >= 2 {
+		args = append(args, ";", "splitw", "-h")
+	}
+
+	if t.Terms >= 3 {
+		args = append(args, ";", "splitw", "-v")
 	}
 
 	exec := exec.Command(cmd, args...)

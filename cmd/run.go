@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	log "github.com/sirupsen/logrus"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/lucasForato/prt/utils"
 	"github.com/spf13/cobra"
@@ -10,19 +11,19 @@ import (
 )
 
 var git bool
-var terms bool
-var term bool
+var terms int
 var cmds []string
 
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Use this command to run a project",
-	Long:  `Use this command to create a tmux session for a project listed on the config.
+	Long: `Use this command to create a tmux session for a project listed on the config.
 
-  - Use [prt ls] to list all possible project. 
-  - Use [prt run] followed by the project and desired configuration.
+  Examples:
+  [prt run my-project -g] -> Starts a session at my-project with a lazygit window.
+  [prt run my-project -t 2] -> Starts a session at my-project with two terminal windows.
   `,
-	Args:  cobra.ExactArgs(1),
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		project := args[0]
 
@@ -56,18 +57,16 @@ var runCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		numTerms := 0
-		if terms {
-			numTerms = 2
-		} else if term {
-			numTerms = 1
+		if terms > 3 {
+			log.WithFields(log.Fields{
+				"provided": terms,
+			}).Fatal("The maximum number of terminal panes is 3.")
 		}
 
 		var tmux = utils.Tmux{
 			Name:  project,
 			Git:   git,
-			Terms: numTerms,
-			Cmd:   cmds,
+			Terms: terms,
 		}
 
 		tmux.CreateSession()
@@ -75,9 +74,8 @@ var runCmd = &cobra.Command{
 }
 
 func init() {
-	runCmd.Flags().BoolVarP(&git, "git", "g", false, "Run with this to a git window")
-	runCmd.Flags().BoolVarP(&terms, "terms", "t", false, "Run with this flag to get two terminals")
-	runCmd.Flags().BoolVarP(&term, "term", "e", false, "Run with this flag to get a single terminal")
-	runCmd.Flags().StringSliceVarP(&cmds, "cmd", "c", cmds, "Run with this flag to add commands to the terminals")
+	runCmd.Flags().BoolVarP(&git, "git", "g", false, "Includes a lazygit window to the session.")
+	runCmd.Flags().IntVarP(&terms, "terms", "t", 2, "Includes a window with the specified number of terminal panes.")
+	runCmd.Flags().Lookup("terms").NoOptDefVal = "2"
 	rootCmd.AddCommand(runCmd)
 }
